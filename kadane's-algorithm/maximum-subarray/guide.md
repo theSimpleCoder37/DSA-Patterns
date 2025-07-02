@@ -330,103 +330,126 @@ Here is the C++ implementation of Kadane's Algorithm.
 #include <climits>   // Needed for INT_MIN
 
 int maxSubArray_optimized(std::vector<int>& nums) {
-    // WHY: Edge case for an empty list. If there are no numbers, there's no subarray.
-    // The problem statement says the subarray must contain at least one number,
-    // but it's good practice to handle this. Let's assume the list is non-empty based on constraints.
+    // WHY: Edge case for an empty list.
+    // The problem states the array is non-empty, so no explicit empty check needed here.
 
-    // WHY: 'max_so_far' is our global maximum. It stores the best answer we've found anywhere.
-    // We initialize it with the first number, not INT_MIN, to correctly handle arrays with all negative numbers.
-    int max_so_far = nums[0];
+    // WHY: Initialize 'max_so_far' to the smallest possible integer,
+    // so any number in the array will be larger and update max_so_far correctly.
+    int max_so_far = INT_MIN;
 
-    // WHY: 'current_sum' is the sum of the subarray we are currently building.
-    // This is the "happiness on the current stretch of the walk."
+    // WHY: 'current_sum' holds the sum of the current subarray we're exploring.
+    // It starts at zero because we haven't added any numbers yet.
     int current_sum = 0;
 
-    // WHY: We use a single loop to iterate through each number in the array just once.
+    // WHY: Iterate over each number once for an O(n) solution.
     for (int num : nums) {
-        // WHY: This is the core logic. If the current stretch of our walk has a negative
-        // sum (it's making us "unhappy"), it's better to start a new stretch.
-        // So, we reset our current sum to 0.
+        // WHY: Add the current number to 'current_sum'—extend the current subarray.
+        current_sum += num;
+
+        // WHY: Update 'max_so_far' if the current sum is better than what we had before.
+        max_so_far = std::max(max_so_far, current_sum);
+
+        // WHY: If the current sum dips below zero, reset it to zero.
+        // This means the current subarray is hurting the total sum,
+        // so start fresh from the next element.
         if (current_sum < 0) {
             current_sum = 0;
         }
-
-        // WHY: We always add the current number to our current stretch.
-        // If we reset just before this, it's like starting a new subarray (0 + num).
-        // If we didn't reset, it's like extending the current subarray.
-        current_sum += num;
-
-        // WHY: After updating our current stretch's sum, we check if this stretch
-        // is the best one we've seen so far in the entire journey.
-        max_so_far = std::max(max_so_far, current_sum);
     }
 
-    // WHY: After checking all the numbers, 'max_so_far' holds the final answer.
+    // WHY: 'max_so_far' now holds the maximum subarray sum found.
     return max_so_far;
 }
 ```
 
 #### **Show the "Dry Run"**
 
-Let's trace this new code with our example: `nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]`
 
-  - **Initial State:** `max_so_far = -2`, `current_sum = 0`.
+```cpp
+nums = [-2, 1, -3, 4, -1, 2, 1, -5, 4]
+```
 
-  - **Loop 1 (num = -2):**
 
-      - `current_sum` (0) is not `< 0`. No reset.
-      - `current_sum` becomes `0 + (-2) = -2`.
-      - `max_so_far` = `max(-2, -2)` -\> `max_so_far` is **-2**.
 
-  - **Loop 2 (num = 1):**
+### Initial State:
 
-      - `current_sum` (-2) is `< 0`. **Reset\!** `current_sum` becomes `0`.
-      - `current_sum` becomes `0 + 1 = 1`.
-      - `max_so_far` = `max(-2, 1)` -\> `max_so_far` is **1**.
+* `max_so_far = INT_MIN` (which is a very small number, but let's just track updates)
+* `current_sum = 0`
 
-  - **Loop 3 (num = -3):**
 
-      - `current_sum` (1) is not `< 0`. No reset.
-      - `current_sum` becomes `1 + (-3) = -2`.
-      - `max_so_far` = `max(1, -2)` -\> `max_so_far` is still **1**.
 
-  - **Loop 4 (num = 4):**
+### Loop 1 (num = -2):
 
-      - `current_sum` (-2) is `< 0`. **Reset\!** `current_sum` becomes `0`.
-      - `current_sum` becomes `0 + 4 = 4`.
-      - `max_so_far` = `max(1, 4)` -\> `max_so_far` is **4**.
+* Add: `current_sum = 0 + (-2) = -2`
+* Update max: `max_so_far = max(INT_MIN, -2) = -2`
+* Since `current_sum < 0` (i.e., -2 < 0), reset `current_sum = 0`
 
-  - **Loop 5 (num = -1):**
 
-      - `current_sum` (4) is not `< 0`. No reset.
-      - `current_sum` becomes `4 + (-1) = 3`.
-      - `max_so_far` = `max(4, 3)` -\> `max_so_far` is still **4**.
 
-  - **Loop 6 (num = 2):**
+### Loop 2 (num = 1):
 
-      - `current_sum` (3) is not `< 0`. No reset.
-      - `current_sum` becomes `3 + 2 = 5`.
-      - `max_so_far` = `max(4, 5)` -\> `max_so_far` is **5**.
+* Add: `current_sum = 0 + 1 = 1`
+* Update max: `max_so_far = max(-2, 1) = 1`
+* `current_sum` is not < 0, so no reset
 
-  - **Loop 7 (num = 1):**
 
-      - `current_sum` (5) is not `< 0`. No reset.
-      - `current_sum` becomes `5 + 1 = 6`.
-      - `max_so_far` = `max(5, 6)` -\> `max_so_far` is **6**.
 
-  - **Loop 8 (num = -5):**
+### Loop 3 (num = -3):
 
-      - `current_sum` (6) is not `< 0`. No reset.
-      - `current_sum` becomes `6 + (-5) = 1`.
-      - `max_so_far` = `max(6, 1)` -\> `max_so_far` is still **6**.
+* Add: `current_sum = 1 + (-3) = -2`
+* Update max: `max_so_far = max(1, -2) = 1`
+* Since `current_sum < 0`, reset `current_sum = 0`
 
-  - **Loop 9 (num = 4):**
 
-      - `current_sum` (1) is not `< 0`. No reset.
-      - `current_sum` becomes `1 + 4 = 5`.
-      - `max_so_far` = `max(6, 5)` -\> `max_so_far` is still **6**.
 
-  - **Loop ends.** Return `max_so_far`, which is **6**.
+### Loop 4 (num = 4):
+
+* Add: `current_sum = 0 + 4 = 4`
+* Update max: `max_so_far = max(1, 4) = 4`
+* `current_sum` is not < 0, so no reset
+
+
+
+### Loop 5 (num = -1):
+
+* Add: `current_sum = 4 + (-1) = 3`
+* Update max: `max_so_far = max(4, 3) = 4`
+* `current_sum` is not < 0, so no reset
+
+
+
+### Loop 6 (num = 2):
+
+* Add: `current_sum = 3 + 2 = 5`
+* Update max: `max_so_far = max(4, 5) = 5`
+* `current_sum` is not < 0, so no reset
+
+
+### Loop 7 (num = 1):
+
+* Add: `current_sum = 5 + 1 = 6`
+* Update max: `max_so_far = max(5, 6) = 6`
+* `current_sum` is not < 0, so no reset
+
+
+
+### Loop 8 (num = -5):
+
+* Add: `current_sum = 6 + (-5) = 1`
+* Update max: `max_so_far = max(6, 1) = 6`
+* `current_sum` is not < 0, so no reset
+
+
+
+### Loop 9 (num = 4):
+
+* Add: `current_sum = 1 + 4 = 5`
+* Update max: `max_so_far = max(6, 5) = 6`
+* `current_sum` is not < 0, so no reset
+
+### Loop ends.
+
+Return `max_so_far` → **6**
 
 #### **Compare Speed and Memory**
 
