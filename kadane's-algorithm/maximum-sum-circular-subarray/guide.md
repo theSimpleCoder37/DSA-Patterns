@@ -282,7 +282,7 @@ The maximum circular subarray sum is **`3`**.
 
 #### **Find the Slow Part**
 
-The slow part of our first solution is the three nested loops.
+The slow part of our first solution is the two nested loops.
 
 ```cpp
 for (int i = 0; i < n; ++i) { // Loop 1
