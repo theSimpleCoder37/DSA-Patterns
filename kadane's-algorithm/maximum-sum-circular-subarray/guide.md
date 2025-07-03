@@ -286,10 +286,8 @@ The slow part of our first solution is the three nested loops.
 
 ```cpp
 for (int i = 0; i < n; ++i) { // Loop 1
-    for (int len = 1; len <= n; ++len) { // Loop 2
-        for (int k = 0; k < len; ++k) { // Loop 3
-            // ... work ...
-        }
+    for (int j = 0; j < n; ++j) { // Loop 2
+        ....work
     }
 }
 ```
