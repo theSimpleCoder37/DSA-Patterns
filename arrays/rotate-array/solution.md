@@ -1,5 +1,5 @@
 > # Implementations are provided below:
-<img width="4053" height="8768" alt="rotate-array excalidraw" src="https://github.com/user-attachments/assets/ec210790-005f-4b18-af7d-7f6bfc983bbe" />
+![rotate-array](https://github.com/user-attachments/assets/ec210790-005f-4b18-af7d-7f6bfc983bbe)
 
 # Brute-Force Code:
 ```cpp
