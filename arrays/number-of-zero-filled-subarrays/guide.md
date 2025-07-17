@@ -1,3 +1,5 @@
+> # [2348. Number of Zero-Filled Subarrays](https://leetcode.com/problems/number-of-zero-filled-subarrays/description/)
+
 ### **Step 1: Understanding the Problem (Breaking It Down)**
 
 First, let's make sure we understand exactly what the problem is asking us to do.
