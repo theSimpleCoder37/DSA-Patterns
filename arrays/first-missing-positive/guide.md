@@ -1,480 +1,368 @@
-### **Step 1: Understanding the Problem (Breaking It Down)**
-
-Let's make sure we understand exactly what the problem is asking us to do.
-
-#### **Tell a Simple Story**
-
-Imagine you have a row of houses on a street. Each house is supposed to have a number, starting from 1, then 2, then 3, and so on.
-
-You are given a list of house numbers that currently exist, but some might be missing, some might be out of order, and some might even have strange numbers like 0 or negative numbers (which don't make sense for house numbers).
-
-Your job is to walk down the street, starting from house number 1, and find the very first house number that is missing. For example, if you see houses `[3, 4, -1, 1]`, you check:
-- Is house #1 there? Yes.
-- Is house #2 there? No.
-- You stop. The first missing positive house number is **2**.
-
-#### **Explain the Parts**
-
-*   **`Inputs`:** We get a list of numbers. In C++, this is represented as a `std::vector<int>`, which we can call `nums`. This list can contain positive numbers, negative numbers, and zeros.
-
-*   **`Output`:** We must return a single integer. This integer is the smallest positive number (1, 2, 3, ...) that is not in the input list.
-
-*   **`Goal`:** Find the smallest positive integer that is missing from the `nums` list.
-
-#### **Show with a Drawing**
-
-Let's visualize the example `nums = [3, 4, -1, 1]`.
-
-Imagine we have buckets for positive numbers, starting from 1.
-
-```
-Positive Number Buckets:
-Bucket #1: [__]
-Bucket #2: [__]
-Bucket #3: [__]
-Bucket #4: [__]
-...and so on
-```
-
-Now, let's go through our input list `[3, 4, -1, 1]` and put the positive numbers into our buckets:
-
-1.  The number is `3`. We put it in Bucket #3.
-2.  The number is `4`. We put it in Bucket #4.
-3.  The number is `-1`. It's negative, so we ignore it.
-4.  The number is `1`. We put it in Bucket #1.
-
-Our buckets now look like this:
-
-```
-Positive Number Buckets:
-Bucket #1: [ 1 ]  <- We found a 1.
-Bucket #2: [__]  <- This bucket is empty.
-Bucket #3: [ 3 ]  <- We found a 3.
-Bucket #4: [ 4 ]  <- We found a 4.
-...
-```
-
-Now, we check the buckets starting from #1.
-- Is Bucket #1 full? Yes.
-- Is Bucket #2 full? No.
-- We found it! The first empty bucket is #2. So, our answer is **2**.
-
-#### **List the Tricky Cases (Edge Cases)**
-
-We need to be careful about these situations:
-
-*   **Empty List:** What if the input is `[]`? The first positive integer is 1, so the answer should be 1.
-*   **No Positive Numbers:** What if the input is `[-1, -2, -5]`? The first positive integer is 1, so the answer should be 1.
-*   **All Numbers are Present:** What if the input is `[1, 2, 3]`? The numbers 1, 2, and 3 are all there. The next positive number that is missing is 4.
-*   **List with Zeros:** The number 0 is not a positive number, so we should ignore it just like negative numbers. For `[0, 1, 2]`, the first missing positive is 3.
-*   **List with Duplicates:** What if the input is `[1, 1, 2, 2]`? We are only concerned with whether a number exists, not how many times it appears. The first missing positive is 3.
-
+># 41. First Missing Positive
 ---
+### Step 1: Understanding the Problem (Breaking It Down)
 
-### **Step 2: The First, Simple Solution (The Brute-Force Way)**
+#### Tell a Simple Story
+Imagine you’re organizing a big party, and you’re assigning numbered wristbands to guests, starting from 1 (like 1, 2, 3, …). You have a list of wristband numbers that were handed out, but some numbers might be missing, and some might be negative or very large (like -5 or 1000). Your job is to find the **smallest positive number** (like 1, 2, 3, …) that wasn’t given to any guest. For example, if the wristbands are [3, 4, -1, 1], the smallest missing positive number is 2 because it’s not in the list.
 
-We'll start with the most obvious and direct approach. It might not be the fastest, but it's the easiest to think of and understand first.
+#### Explain the Parts
+- **Inputs**: You get an array of integers (e.g., `nums = [1, 2, 0]` or `nums = [3, 4, -1, 1]`). The array can contain positive numbers, negative numbers, zeros, or duplicates, and it might not be sorted.
+- **Outputs**: You need to return a single integer—the **smallest positive integer** (1, 2, 3, …) that is *not* present in the array.
+- **Goal**: Find the first positive number that is missing from the array. For example:
+  - If `nums = [1, 2, 0]`, the output is 3 (because 1 and 2 are in the array, but 3 is not).
+  - If `nums = [3, 4, -1, 1]`, the output is 2 (because 1, 3, and 4 are present, but 2 is missing).
 
-#### **Explain the Simple Idea**
+#### Show with a Drawing
+Let’s visualize the array `nums = [3, 4, -1, 1]` as a number line to see which positive numbers are present:
 
-The simplest logic is this: let's just check for the positive numbers one by one, starting from 1.
+```
+Number line:  1  2  3  4  5  ...
+Present?    [✔]    [✔][✔]    ...
+```
 
-1.  First, we'll check if the number `1` is anywhere in our input list `nums`.
-2.  If it is, great. Now we check if the number `2` is in the list.
-3.  If it is, we check for `3`.
-4.  We keep doing this. The very first number we check for that we *cannot* find in the list is our answer.
+- The array has 1, 3, and 4.
+- The number 2 is missing, and it’s the smallest positive number not in the array.
+- So, the answer is 2.
 
-So, we need two main parts:
-*   A way to generate the numbers we are looking for: `1, 2, 3, 4, ...`
-*   A way to search the entire `nums` list for the number we are looking for.
+#### List the Tricky Cases
+We need to be careful about these edge cases:
+1. **Empty array**: If `nums = []`, the smallest positive number is 1 (since no numbers are present).
+2. **All negative numbers or zeros**: If `nums = [-1, -2, 0]`, the answer is 1 (no positive numbers exist).
+3. **No gaps in sequence**: If `nums = [1, 2, 3, 4]`, the answer is 5 (the next number after 4).
+4. **Duplicates**: If `nums = [1, 1, 1]`, the answer is 2 (1 is present, but 2 is missing).
+5. **Large numbers**: If `nums = [1, 2, 1000]`, we ignore 1000 because we only care about small positive numbers, so the answer is 3.
+6. **Unsorted array**: The array might be in any order, like `[3, 1, 4, -1]`, but the answer is still 2.
 
-#### **Write the C++ Code**
+#### Key Insight
+Since we’re looking for the *smallest* positive integer, we only care about numbers like 1, 2, 3, … up to the size of the array (`n`) or slightly more. Any number larger than `n + 1` or negative numbers can’t be the answer because if all numbers from 1 to `n` are present, the answer is `n + 1`.
 
-Here is the C++ code that does exactly that.
+--- 
+
+### Step 2: The First, Simple Solution (The Brute-Force Way)
+
+#### Explain the Simple Idea
+The simplest way to find the smallest missing positive integer is to:
+1. Ignore all negative numbers, zeros, and numbers larger than the array size (`n`), because the smallest missing positive number must be between 1 and `n + 1` (if all numbers from 1 to `n` are present, the answer is `n + 1`).
+2. Check every positive integer starting from 1 (i.e., 1, 2, 3, …) to see if it exists in the array.
+3. The first number we check that is *not* in the array is our answer.
+
+To make checking faster, we can use a **set** to store all positive numbers from the array. Then, we can quickly check if each number (1, 2, 3, …) is in the set.
+
+#### Write the C++ Code
+Here’s the brute-force solution using a set:
 
 ```cpp
-#include <iostream>
 #include <vector>
-#include <climits> // Required for INT_MAX
+#include <unordered_set>
+using namespace std;
 
-class Solution {
-public:
-    int firstMissingPositive(std::vector<int>& nums) {
-        // WHY: We need to check for positive numbers starting from 1.
-        // We can use a loop that goes from 1 up to a very large number.
-        // INT_MAX is the largest possible integer, but we won't reach it.
-        // A more practical upper bound is nums.size() + 1, because in the worst case
-        // where nums = [1, 2, 3], the answer is 4 (size + 1).
-        for (int i = 1; i <= nums.size() + 1; ++i) {
-            // WHY: For each number `i` (1, 2, 3...), we need to know if it exists in `nums`.
-            // We'll use a flag, `found`, to keep track. We start by assuming it's not there.
-            bool found = false;
-
-            // WHY: This is the inner search loop. It goes through every single element in `nums`.
-            for (int num : nums) {
-                // WHY: We compare the number we are looking for (`i`) with the current element (`num`).
-                if (num == i) {
-                    // WHY: If we find it, we set our flag to true.
-                    found = true;
-                    // WHY: We can stop searching for `i` now, since we've already found it.
-                    // This `break` makes the code slightly faster but doesn't change the overall slowness.
-                    break;
-                }
-            }
-
-            // WHY: After checking all the elements in `nums`, we look at our `found` flag.
-            // If `found` is still false, it means we never found the number `i` in the list.
-            if (!found) {
-                // WHY: Since we are checking in increasing order (1, then 2, then 3...),
-                // this `i` must be the *first* positive number that is missing.
-                return i;
-            }
-        }
-
-        // WHY: This line is technically unreachable because we are guaranteed to find a
-        // missing positive integer within the loop `1` to `nums.size() + 1`.
-        // However, C++ compilers might require a return statement outside the loop.
-        return 1;
-    }
-};
-```
-
-#### **Show a Detailed "Dry Run"**
-
-Let's trace this code with our example: `nums = [3, 4, -1, 1]`.
-
-*   **Outer loop starts:** `i` becomes `1`.
-    *   `found` is set to `false`.
-    *   **Inner loop starts** to search for `1` in `[3, 4, -1, 1]`.
-        *   Is `3 == 1`? No.
-        *   Is `4 == 1`? No.
-        *   Is `-1 == 1`? No.
-        *   Is `1 == 1`? Yes.
-    *   `found` is set to `true`.
-    *   The `break` is hit, and the inner loop ends.
-    *   We check `if (!found)`. Since `found` is `true`, we do nothing. The outer loop continues.
-
-*   **Outer loop continues:** `i` becomes `2`.
-    *   `found` is set to `false`.
-    *   **Inner loop starts** to search for `2` in `[3, 4, -1, 1]`.
-        *   Is `3 == 2`? No.
-        *   Is `4 == 2`? No.
-        *   Is `-1 == 2`? No.
-        *   Is `1 == 2`? No.
-    *   The inner loop finishes. `found` is still `false`.
-    *   We check `if (!found)`. Since `found` is `false`, this is `true`.
-    *   **The function returns `i`, which is `2`. The program ends.**
-
-The answer is **2**.
-
-#### **Analyze Speed and Memory (The Easy Way)**
-
-*   **Time (Speed):**
-    Let's say the number of elements in our list `nums` is `N`.
-    The code has a loop inside another loop (a nested loop).
-    The outer loop, in the worst case (like `[1, 2, ..., N]`), runs about `N` times.
-    The inner loop *always* has to search through the `N` elements of `nums`.
-    So, the total amount of work is roughly `N` (from the outer loop) times `N` (from the inner loop).
-    This gives us a time complexity of **$O(N^2)$**. This is considered slow for large lists.
-
-*   **Space (Memory):**
-    Look at the extra memory we used. We created a few variables like `i` and `found`, but we didn't create any new lists or data structures that grow in size as the input list `nums` gets bigger.
-    Because the extra memory usage doesn't depend on the size of the input, we say the space complexity is constant, or **$O(1)$**.
-
----
-
-### **Step 3: Thinking Towards a Better Way (The Expert's Thought Process)**
-
-Now, let's put on our "expert problem-solver" hat. How would an expert analyze the slow solution and come up with a brilliant new idea?
-
-#### **Find the Slow Part**
-
-First, an expert would pinpoint the exact source of the slowness. Let's look at our previous code:
-
-```cpp
-for (int i = 1; i <= nums.size() + 1; ++i) { // Outer loop
-    bool found = false;
-    for (int num : nums) { // <--- THIS IS THE SLOW PART
-        if (num == i) {
-            found = true;
-            break;
+int firstMissingPositive(vector<int>& nums) {
+    // WHY: Create a set to store all positive numbers from the array for fast lookup.
+    unordered_set<int> seen;
+    
+    // WHY: Go through the array and add only positive numbers to the set.
+    for (int num : nums) {
+        if (num > 0) {
+            seen.insert(num); // WHY: Store positive numbers to check later.
         }
     }
-    if (!found) {
-        return i;
+    
+    // WHY: Check numbers 1, 2, 3, ... until we find one not in the set.
+    int i = 1;
+    while (true) {
+        if (seen.find(i) == seen.end()) {
+            // WHY: If i is not in the set, it's the smallest missing positive number.
+            return i;
+        }
+        i++; // WHY: Move to the next number to check.
     }
 }
 ```
 
-The slow part is the **inner loop**. For every single number we want to check (1, then 2, then 3...), we are forced to scan the *entire* `nums` list from beginning to end. If `nums` has a million items, we might do a million searches! That's a huge amount of repeated, wasted work.
+#### Explain Every Line
+- **`unordered_set<int> seen;`**: We create a set to store all positive numbers from the array. A set allows us to check if a number exists in constant time (very fast).
+- **`for (int num : nums)`**: We loop through each number in the array.
+- **`if (num > 0)`**: We only care about positive numbers because negative numbers and zero can’t be the answer (the answer is a positive integer).
+- **`seen.insert(num);`**: If the number is positive, we add it to the set. The set automatically handles duplicates (e.g., if `[1, 1, 1]` is in the array, it only stores 1 once).
+- **`int i = 1; while (true)`**: We start checking from 1 (the smallest possible answer) and keep going (2, 3, 4, …) until we find a missing number.
+- **`if (seen.find(i) == seen.end())`**: If `i` is not in the set, it’s the first missing positive number, so we return it.
+- **`i++;`**: If `i` is in the set, we check the next number.
 
-#### **Reveal the "Aha!" Idea**
+#### Show a Detailed "Dry Run"
+Let’s walk through the example `nums = [3, 4, -1, 1]` step-by-step to see how the code works.
 
-An expert's thought process would be: *"How can I avoid searching the whole list every single time? How can I check if a number exists instantly?"*
+1. **Initialize the set**:
+   - `seen = {}` (empty set).
 
-**Thought #1: Use a better storage system.**
-The first idea that comes to mind is to use a data structure built for fast lookups. A hash set (like `std::unordered_set` in C++) is perfect. It's like creating a phone book for our numbers. Checking if a number is in a hash set is almost instant ($O(1)$ on average).
+2. **Loop through the array**:
+   - `num = 3`: Positive, so add to set. Now `seen = {3}`.
+   - `num = 4`: Positive, so add to set. Now `seen = {3, 4}`.
+   - `num = -1`: Negative, skip it. `seen = {3, 4}`.
+   - `num = 1`: Positive, so add to set. Now `seen = {1, 3, 4}`.
 
-This would work, and it's a good solution:
-1.  Create an empty hash set.
-2.  Go through `nums` *once* and add all the positive numbers to the hash set.
-3.  Then, loop from `i = 1, 2, 3...` and check if `i` is in the hash set. The first one that isn't is the answer.
+3. **Check for the first missing positive**:
+   - Check `i = 1`: Is 1 in `seen`? Yes (1 is in `{1, 3, 4}`), so continue.
+   - Check `i = 2`: Is 2 in `seen`? No (2 is not in `{1, 3, 4}`), so return 2.
 
-This approach is much faster (Time: $O(N)$), but it uses extra memory for the hash set (Space: $O(N)$). This is a great improvement! But for this specific problem, there's a follow-up challenge: "Can you solve it in $O(N)$ time and **$O(1)$ constant space**?" This means we can't use a new data structure like a hash set.
+**Result**: The smallest missing positive number is 2.
 
-**Thought #2: The "Aha!" Idea for $O(1)$ Space**
-So, the expert asks: *"If I can't use a new data structure, can I use the input array `nums` **itself** as my storage system?"*
+Let’s try an edge case: `nums = [1, 2, 3, 4]` (no gaps).
+- **Loop through array**:
+  - `num = 1`: Add to set. `seen = {1}`.
+  - `num = 2`: Add to set. `seen = {1, 2}`.
+  - `num = 3`: Add to set. `seen = {1, 2, 3}`.
+  - `num = 4`: Add to set. `seen = {1, 2, 3, 4}`.
+- **Check numbers**:
+  - `i = 1`: In set, continue.
+  - `i = 2`: In set, continue.
+  - `i = 3`: In set, continue.
+  - `i = 4`: In set, continue.
+  - `i = 5`: Not in set, return 5.
 
-This is the key insight. We are looking for a missing number like 1, 2, 3, etc. Let's say our array has `N` elements. The smallest missing positive number must be somewhere between `1` and `N+1`.
+**Result**: The answer is 5.
 
-*   **Example:** If `nums` has 4 elements, the answer can't be 58. The answer must be 1, 2, 3, 4, or 5. Why? Because if 1, 2, 3, and 4 are all present in those 4 slots, the first one missing is 5. If one of them is missing, that's the answer.
-*   So, we only really care about the numbers from `1` to `N`. Any number like `-5`, `0`, or `N+100` is "junk" because it doesn't help us fill the slots for `1` to `N`.
+#### Analyze Speed and Memory (The Easy Way)
+- **Time (Speed)**:
+  - **Step 1: Building the set**: We loop through the array once to add positive numbers to the set. This takes `O(n)` time, where `n` is the array size.
+  - **Step 2: Checking numbers**: In the worst case, we check numbers 1, 2, 3, … up to `n + 1`. If the array has all numbers from 1 to `n` (e.g., `[1, 2, 3, 4]`), we check up to `n + 1`. Each check in the set is `O(1)` (constant time), but we might do up to `n + 1` checks. So, this step is `O(n)`.
+  - **Total time**: `O(n)` (building the set) + `O(n)` (checking numbers) = `O(n)`. However, in practice, the checking step depends on the answer, so we’ll call it `O(n)` for simplicity, but it’s not ideal because we’re doing extra work.
 
-The brilliant idea is to treat the array like a set of buckets or slots.
-*   The number `1` should go into index `0`.
-*   The number `2` should go into index `1`.
-*   The number `3` should go into index `2`.
-*   ...
-*   The number `x` should go into index `x-1`.
+- **Space (Memory)**:
+  - We create a set to store positive numbers. In the worst case, the array could have up to `n` positive numbers (e.g., `[1, 2, 3, ..., n]`). So, the set uses `O(n)` space.
+  - We also use a few variables (like `i`), which are `O(1)` (constant space).
+  - **Total space**: `O(n)` because of the set.
 
-Our new goal: **Put every number in its "correct" spot.** We can iterate through the array and if a number is not in its correct place, we swap it to where it belongs.
-
-#### **Draw the New Idea**
-
-Let's see this swapping idea in action with `nums = [3, 4, -1, 1]`. The size `N` is 4. We want to put `1` at index 0, `2` at index 1, `3` at index 2, and `4` at index 3.
-
-**Initial State:**
-`index: 0   1   2   3`
-`nums: [3,  4, -1,  1]`
-
-**Let's start at `i = 0`:**
-*   The number is `nums[0] = 3`. Its correct spot is index `3 - 1 = 2`.
-*   Is the number at index 2 (`-1`) the same as our number (`3`)? No.
-*   So, let's swap `nums[0]` with `nums[2]`.
-`nums` becomes: `[-1, 4, 3, 1]`
-
-*   We stay at `i = 0` because the new number (`-1`) might also need to be moved.
-*   The number is now `nums[0] = -1`. This is "junk" (less than 1). We can't place it. So we're done with this position for now. Move to the next index.
-
-**Move to `i = 1`:**
-*   The number is `nums[1] = 4`. Its correct spot is index `4 - 1 = 3`.
-*   Is the number at index 3 (`1`) the same as our number (`4`)? No.
-*   Let's swap `nums[1]` with `nums[3]`.
-`nums` becomes: `[-1, 1, 3, 4]`
-
-*   We stay at `i = 1` to re-check the new number we just swapped in.
-*   The number is now `nums[1] = 1`. Its correct spot is index `1 - 1 = 0`.
-*   Is the number at index 0 (`-1`) the same as our number (`1`)? No.
-*   Let's swap `nums[1]` with `nums[0]`.
-`nums` becomes: `[1, -1, 3, 4]`
-
-*   We re-check `i = 1`. The number is now `nums[1] = -1`. It's junk. We can move on.
-
-**Move to `i = 2`:**
-*   The number is `nums[2] = 3`. Its correct spot is index `3 - 1 = 2`.
-*   It's already in the right place! `nums[2]` is indeed `3`. Great. Move on.
-
-**Move to `i = 3`:**
-*   The number is `nums[3] = 4`. Its correct spot is index `4 - 1 = 3`.
-*   It's also already in the right place! Move on.
-
-**The array is now sorted in a special way:**
-`index: 0   1   2   3`
-`nums: [1, -1, 3, 4]`
-
-Now, we do a final, simple walk-through:
-1.  Is `nums[0]` equal to `0 + 1` (which is 1)? Yes.
-2.  Is `nums[1]` equal to `1 + 1` (which is 2)? No! It's `-1`.
-3.  We found it! The first position `i` where `nums[i] != i + 1` is index 1. This means the missing number is `1 + 1 = 2`.
-
-This "place the numbers" strategy is called a **Cyclic Sort**. We use the array's own indices as the guide for where to put the numbers.
+This solution is simple but uses extra memory for the set. The good news is that it’s fairly fast (`O(n)` time), but we can do better by avoiding extra space, which we’ll explore in the next step.
 
 ---
 
-### **Step 4: The Smart Solution (The Optimized Code)**
 
-This solution uses the array itself to store information, which is a clever way to save memory.
+### Step 3: Thinking Towards a Better Way (The Expert's Thought Process)
 
-#### **Write the Optimized C++ Code**
+#### Find the Slow Part
+Let’s look at the brute-force solution and identify what’s not ideal:
+- **Extra Memory**: The biggest issue is that we’re using an `unordered_set` to store all positive numbers, which takes `O(n)` extra space. For an array of size `n`, we’re creating a set that could store up to `n` numbers. This is wasteful because we’re using extra memory when the array itself could hold the information we need.
+- **Checking Numbers**: While the time complexity is `O(n)` (looping through the array once to build the set and checking up to `n + 1` numbers), we’re doing extra work by checking numbers one by one in the `while` loop. An expert would ask, “Can we find the missing number by working *within* the array itself, without needing a separate set or extra checks?”
 
-Here is the full C++ code implementing the Cyclic Sort idea.
+The slow part isn’t the time (since `O(n)` is decent), but the **space usage** (`O(n)`) is a problem. We want a solution that uses **constant space** (`O(1)`), meaning we only use a few extra variables, not a whole set.
 
-```cpp
-#include <iostream>
-#include <vector>
-#include <utility> // Required for std::swap
+#### Reveal the "Aha!" Idea
+An expert would think: “The array has `n` numbers, so the smallest missing positive integer must be between 1 and `n + 1`. For example, if the array has 4 numbers (`n = 4`), the answer is either 1, 2, 3, 4, or 5. Can we use the array itself to mark which numbers from 1 to `n` are present, without using extra space?”
 
-class Solution {
-public:
-    int firstMissingPositive(std::vector<int>& nums) {
-        int n = nums.size();
+Here’s the key insight:
+- We can use the **array indices** to track which positive numbers are present. For example, if the number 1 is in the array, we can mark index 0 (since index 0 corresponds to 1). If the number 2 is present, we mark index 1, and so on.
+- How do we “mark” an index? We can modify the array in-place by changing the sign of the number at that index to negative (e.g., if we see 1, make the number at index 0 negative). This way, a negative number at index `i` means the number `i + 1` is present.
+- After marking, we scan the array again. The first index `i` where the number is positive (or not marked) means `i + 1` is the missing number.
 
-        // --- Phase 1: Place numbers in their correct spots ---
-        // WHY: We use a for loop to look at each position in the array once.
-        for (int i = 0; i < n; ++i) {
-            // WHY: This inner `while` loop is the magic. It keeps swapping the number
-            // at the current position `i` until the number is in its correct home,
-            // or until we find a "junk" number that we can't place.
-            //
-            // Let `num = nums[i]`.
-            // `num > 0 && num <= n`: We only care about numbers that can fit in our
-            //                          n-sized array (1 to n). Ignore negatives, 0, and large numbers.
-            // `nums[i] != nums[num - 1]`: The number `num` should be at index `num - 1`.
-            //                                We only swap if the number is NOT already there.
-            //                                This also prevents an infinite loop with duplicate numbers.
-            while (nums[i] > 0 && nums[i] <= n && nums[i] != nums[nums[i] - 1]) {
-                // WHY: Swap the current number `nums[i]` to its correct destination `nums[nums[i] - 1]`.
-                std::swap(nums[i], nums[nums[i] - 1]);
-            }
-        }
+This approach is clever because:
+- It uses the array itself as a “hash table” to mark presence, so we don’t need extra space.
+- We only care about numbers from 1 to `n`, so we can ignore negative numbers, zeros, and numbers larger than `n`.
 
-        // --- Phase 2: Find the first missing number ---
-        // WHY: After Phase 1, the array is partially sorted. Now we just need to
-        // find the first spot where the number doesn't match the index.
-        for (int i = 0; i < n; ++i) {
-            // WHY: We expect the number `i + 1` to be at index `i`.
-            // For example, at index 0, we expect to see the number 1.
-            // If it's not there, then `i + 1` is the first missing positive.
-            if (nums[i] != i + 1) {
-                return i + 1;
-            }
-        }
+#### Draw the New Idea
+Let’s use ASCII art to visualize how we’ll modify the array `nums = [3, 4, -1, 1]` to mark numbers:
 
-        // WHY: If the loop finishes, it means we found 1, 2, 3, ..., n in their correct spots.
-        // For example, if nums was `[1, 2, 3]`, it will remain `[1, 2, 3]`.
-        // The first missing positive is therefore `n + 1`.
-        return n + 1;
-    }
-};
+**Step 1: Ignore irrelevant numbers**
+- We only care about numbers from 1 to `n` (here, `n = 4`, so 1 to 4). Replace negative numbers, zeros, and numbers > `n` with `n + 1` (which is 5 here, since it can’t be the answer unless all 1 to 4 are present).
+- Array: `[3, 4, -1, 1]` → Replace `-1` with `5`: `[3, 4, 5, 1]`.
+
+```
+Index:  0  1  2  3
+Value: [3][4][5][1]
 ```
 
-#### **Give a Simple Analogy**
+**Step 2: Mark presence**
+- For each number, if it’s between 1 and `n`, mark its corresponding index by making the number at that index negative.
+- Number 3: Mark index 2 (3-1) by making `nums[2]` negative: `[3, 4, -5, 1]`.
+- Number 4: Mark index 3 (4-1) by making `nums[3]` negative: `[3, 4, -5, -1]`.
+- Number 5: Ignore (it’s > `n`).
+- Number 1: Mark index 0 (1-1) by making `nums[0]` negative: `[-3, 4, -5, -1]`.
 
-This technique is called **Cyclic Sort**.
+```
+Index:  0  1  2  3
+Value: [-3][4][-5][-1]
+Marks:   1     3   4  (negative means number is present)
+```
 
-Think of it like this: You have a box of `N` letters, each with a mailing slot number from 1 to `N`. You are the mail sorter. You pick up a letter. If it's for slot #5, you go to slot #5 and put it there. You keep doing this. Some letters might be junk mail (negative numbers) which you ignore. After you've tried to place every letter in its correct slot, you just look through the slots starting from #1. The first empty slot you find is your answer.
+**Step 3: Find the first positive index**
+- Scan the array: `[-3, 4, -5, -1]`.
+- Index 0 is negative (means 1 is present).
+- Index 1 is positive (means 2 is missing).
+- Stop here. The answer is `1 + 1 = 2`.
 
-#### **Show the "Dry Run"**
-
-Let's trace this optimized code with `nums = [3, 4, -1, 1]` and `n = 4`.
-
-**Phase 1: Sorting**
-
-*   **`i = 0`**: `nums` is `[3, 4, -1, 1]`
-    *   `nums[0]` is `3`. Let's check the `while` loop conditions for `num = 3`:
-        *   Is `3 > 0` and `3 <= 4`? Yes.
-        *   Is `nums[0] != nums[3 - 1]`? (i.e., Is `3 != nums[2]`, which is `-1`?) Yes.
-        *   Conditions met! **Swap `nums[0]` and `nums[2]`**.
-    *   `nums` becomes `[-1, 4, 3, 1]`.
-    *   The `while` loop checks again for `i = 0`: `nums[0]` is now `-1`.
-        *   Is `-1 > 0`? No. The `while` loop stops.
-    *   The `for` loop moves to the next `i`.
-
-*   **`i = 1`**: `nums` is `[-1, 4, 3, 1]`
-    *   `nums[1]` is `4`. Let's check the `while` loop for `num = 4`:
-        *   Is `4 > 0` and `4 <= 4`? Yes.
-        *   Is `nums[1] != nums[4 - 1]`? (i.e., Is `4 != nums[3]`, which is `1`?) Yes.
-        *   Conditions met! **Swap `nums[1]` and `nums[3]`**.
-    *   `nums` becomes `[-1, 1, 3, 4]`.
-    *   The `while` loop checks again for `i = 1`: `nums[1]` is now `1`.
-        *   Is `1 > 0` and `1 <= 4`? Yes.
-        *   Is `nums[1] != nums[1 - 1]`? (i.e., Is `1 != nums[0]`, which is `-1`?) Yes.
-        *   Conditions met! **Swap `nums[1]` and `nums[0]`**.
-    *   `nums` becomes `[1, -1, 3, 4]`.
-    *   The `while` loop checks again for `i = 1`: `nums[1]` is now `-1`.
-        *   Is `-1 > 0`? No. The `while` loop stops.
-    *   The `for` loop moves to the next `i`.
-
-*   **`i = 2`**: `nums` is `[1, -1, 3, 4]`
-    *   `nums[2]` is `3`. Check `while` loop for `num = 3`:
-        *   Is `3 > 0` and `3 <= 4`? Yes.
-        *   Is `nums[2] != nums[3 - 1]`? (i.e., Is `3 != nums[2]`, which is `3`?) No, they are equal. The `while` loop stops.
-
-*   **`i = 3`**: `nums` is `[1, -1, 3, 4]`
-    *   `nums[3]` is `4`. Check `while` loop for `num = 4`:
-        *   Is `4 > 0` and `4 <= 4`? Yes.
-        *   Is `nums[3] != nums[4 - 1]`? (i.e., Is `4 != nums[3]`, which is `4`?) No, they are equal. The `while` loop stops.
-
-**Phase 2: Finding the Missing Number**
-
-The sorted array is `[1, -1, 3, 4]`.
-
-*   **`i = 0`**: Is `nums[0] != 0 + 1`? (i.e., Is `1 != 1`?) No, they are equal.
-*   **`i = 1`**: Is `nums[1] != 1 + 1`? (i.e., Is `-1 != 2`?) Yes! They are not equal.
-*   **Return `i + 1`**, which is `1 + 1 = 2`. The function ends.
-
-#### **Compare Speed and Memory**
-
-*   **Brute-Force Solution:**
-    *   Time: **$O(N^2)$**. Slow because of the nested loop.
-    *   Space: **$O(1)$**. Good, no extra memory.
-
-*   **Optimized (Cyclic Sort) Solution:**
-    *   Time: **$O(N)$**. This is much faster. Although there is a nested `while` loop, the total number of swaps can't be more than `N`. Each swap puts a number in its correct final home. So the total work is proportional to `N`, not `N * N`.
-    *   Space: **$O(1)$**. Still great. We only modified the original array.
-
-This is a huge improvement in speed without using any extra memory!
+This approach uses the array itself to “remember” which numbers are present, saving space!
 
 ---
 
-### **Step 5: How to Explain Your Solution (The Interview Plan)**
+### Step 4: The Smart Solution (The Optimized Code)
 
-Having a great solution is only half the battle. Explaining it well is the other half. Here is a simple, step-by-step template you can follow.
+#### Write the Optimized C++ Code
+Here’s the optimized solution that uses the array itself to mark numbers and achieves `O(1)` extra space:
 
-#### **Provide a Clear Template**
+```cpp
+#include <vector>
+using namespace std;
 
-Imagine an interviewer asks: "Can you solve the 'First Missing Positive' problem?" Here's how you can respond:
+int firstMissingPositive(vector<int>& nums) {
+    int n = nums.size(); // WHY: Get the size of the array.
+    
+    // Step 1: Replace negative numbers, zeros, and numbers > n with n + 1
+    for (int i = 0; i < n; i++) {
+        // WHY: We only care about numbers 1 to n. Replace others with n + 1.
+        if (nums[i] <= 0 || nums[i] > n) {
+            nums[i] = n + 1;
+        }
+    }
+    
+    // Step 2: Mark presence of each number by making the corresponding index negative
+    for (int i = 0; i < n; i++) {
+        // WHY: Use absolute value since the number might already be negative from prior marking.
+        int num = abs(nums[i]);
+        // WHY: Only mark if num is between 1 and n.
+        if (num <= n) {
+            // WHY: Mark index (num - 1) as negative to indicate num is present.
+            nums[num - 1] = -abs(nums[num - 1]);
+        }
+    }
+    
+    // Step 3: Find the first positive number's index
+    for (int i = 0; i < n; i++) {
+        // WHY: If nums[i] is positive, then i + 1 is not marked, so it's missing.
+        if (nums[i] > 0) {
+            return i + 1;
+        }
+    }
+    
+    // WHY: If all numbers 1 to n are present, the answer is n + 1.
+    return n + 1;
+}
+```
 
-**1. The Goal:**
-"Of course. The goal of this problem is to find the smallest positive integer (like 1, 2, 3,...) that doesn't exist in a given unsorted list of numbers. The list can also contain negative numbers and zeros."
+#### Explain the "Why"
+- **`int n = nums.size();`**: We store the array size `n` for easy reference. The answer will be between 1 and `n + 1`.
+- **Step 1: Replace irrelevant numbers**:
+  - **`for (int i = 0; i < n; i++)`**: Loop through the array.
+  - **`if (nums[i] <= 0 || nums[i] > n)`**: We only care about numbers from 1 to `n`. Negative numbers, zeros, and numbers larger than `n` can’t be the answer, so we replace them with `n + 1` (a number we know can’t be the answer unless all 1 to `n` are present).
+  - **`nums[i] = n + 1;`**: Set these numbers to `n + 1` to ignore them later.
+- **Step 2: Mark presence**:
+  - **`for (int i = 0; i < n; i++)`**: Loop through the array again.
+  - **`int num = abs(nums[i]);`**: Use the absolute value because `nums[i]` might already be negative from prior marking, but we need the original number.
+  - **`if (num <= n)`**: Only process numbers from 1 to `n` (ignore `n + 1`).
+  - **`nums[num - 1] = -abs(nums[num - 1]);`**: Mark the index `num - 1` as negative to indicate that `num` is present. We use `abs` again to ensure we don’t flip a negative number back to positive.
+- **Step 3: Find the first missing number**:
+  - **`for (int i = 0; i < n; i++)`**: Loop through the array one last time.
+  - **`if (nums[i] > 0)`**: If the number at index `i` is positive, it wasn’t marked, meaning `i + 1` is missing, so return `i + 1`.
+- **`return n + 1;`**: If we exit the loop, all numbers from 1 to `n` are present, so the answer is `n + 1`.
 
-**2. My Solution Idea:**
-"My approach is to solve this in linear time, $O(N)$, and with constant extra space, $O(1)$. The key idea is to use the input array itself as a sort of hash map or a set of buckets to keep track of the numbers we've seen. I'll use a technique called **Cyclic Sort**."
+#### Give a Simple Analogy
+This solution uses the **In-Place Hashing** technique. It’s like using a notebook (the array) where each page (index) represents a number (index + 1). When you see a number, you put a checkmark (negative sign) on its page. After checking all numbers, you look for the first page without a checkmark—that’s the missing number. The notebook itself holds all the information, so you don’t need an extra list.
 
-**3. How it Works:**
-"My plan has two main parts:"
-*   "**First, I'll rearrange the array.** I'll iterate through the array. For each number, if it's a positive number that belongs in the array (e.g., the number `x` should be at index `x-1`), I'll swap it to its correct position. I'll ignore all 'junk' numbers like negatives, zero, or numbers larger than the array's size."
-*   "After this first pass, the array will be partially sorted. For example, the number 1 will be at index 0, 3 at index 2, and so on, if they exist."
-*   "**Second, I'll find the missing number.** I'll walk through the modified array one last time. I'll check if the number at each index `i` is equal to `i + 1`. The very first index where this is not true tells me the missing number. For instance, if `nums[1]` is not `2`, then `2` is my answer."
+#### Show the "Dry Run"
+Let’s walk through `nums = [3, 4, -1, 1]` (n = 4) step-by-step:
 
-**4. Performance:**
-"This solution is very efficient."
-*   "The **time complexity is $O(N)$**. Although there's a nested `while` loop, each number is swapped at most once to its correct final position. So, we are essentially processing each number a constant number of times."
-*   "The **space complexity is $O(1)$** because I'm not using any extra data structures. I'm modifying the input array in-place."
+1. **Step 1: Replace irrelevant numbers**:
+   - Array: `[3, 4, -1, 1]`.
+   - Check each number:
+     - `nums[0] = 3`: Keep (it’s between 1 and 4).
+     - `nums[1] = 4`: Keep.
+     - `nums[2] = -1`: Replace with `n + 1 = 5` (since -1 is negative).
+     - `nums[3] = 1`: Keep.
+   - Array becomes: `[3, 4, 5, 1]`.
 
-**5. Tricky Cases:**
-"My code handles the tricky cases naturally. By only considering numbers from 1 to `N` (the array size), I automatically filter out negatives and zeros. If all numbers from 1 to `N` are present, my final loop will complete without finding a mismatch, and I'll correctly return `N+1` as the answer."
+2. **Step 2: Mark presence**:
+   - Loop through the array: `[3, 4, 5, 1]`.
+   - `i = 0, num = abs(nums[0]) = 3`: Since 3 ≤ 4, mark index `3-1 = 2` by making `nums[2]` negative: `nums[2] = -abs(5) = -5`.
+     - Array: `[3, 4, -5, 1]`.
+   - `i = 1, num = abs(nums[1]) = 4`: Since 4 ≤ 4, mark index `4-1 = 3`: `nums[3] = -abs(1) = -1`.
+     - Array: `[3, 4, -5, -1]`.
+   - `i = 2, num = abs(nums[2]) = 5`: Since 5 > 4, skip.
+   - `i = 3, num = abs(nums[3]) = 1`: Since 1 ≤ 4, mark index `1-1 = 0`: `nums[0] = -abs(3) = -3`.
+     - Array: `[-3, 4, -5, -1]`.
+
+3. **Step 3: Find the first positive**:
+   - Loop through: `[-3, 4, -5, -1]`.
+   - `i = 0`: `nums[0] = -3` (negative, 1 is present).
+   - `i = 1`: `nums[1] = 4` (positive, 2 is missing). Return `1 + 1 = 2`.
+
+**Result**: The answer is 2.
+
+**Edge Case: `nums = [1, 2, 3, 4]`**:
+- Step 1: All numbers are between 1 and 4, so no changes: `[1, 2, 3, 4]`.
+- Step 2: Mark each number:
+  - `num = 1`: Mark index 0: `[-1, 2, 3, 4]`.
+  - `num = 2`: Mark index 1: `[-1, -2, 3, 4]`.
+  - `num = 3`: Mark index 2: `[-1, -2, -3, 4]`.
+  - `num = 4`: Mark index 3: `[-1, -2, -3, -4]`.
+- Step 3: All numbers are negative, so return `n + 1 = 4 + 1 = 5`.
+
+**Result**: The answer is 5.
+
+#### Compare Speed and Memory
+- **Time Complexity**:
+  - **Brute-Force**: `O(n)` (build set) + `O(n)` (check numbers) = `O(n)`. However, the checking step depends on the answer, which could be up to `n + 1`.
+  - **Optimized**: Three passes through the array:
+    - Step 1: `O(n)` to replace irrelevant numbers.
+    - Step 2: `O(n)` to mark indices.
+    - Step 3: `O(n)` to find the first positive.
+    - Total: `O(n)` (3 passes, but still linear). It’s comparable to brute-force but more predictable since it’s always exactly three passes.
+- **Space Complexity**:
+  - **Brute-Force**: `O(n)` for the set to store positive numbers.
+  - **Optimized**: `O(1)` because we only use a few variables (`n`, `i`, `num`) and modify the array in-place. This is a huge improvement!
+
+The optimized solution is better because it uses **constant space** instead of `O(n)` space, while maintaining `O(n)` time.
 
 ---
 
-### **Step 6: Key Lessons and Future Problems**
 
-#### **The Main Pattern**
+### Step 5: How to Explain Your Solution (The Interview Plan)
 
-The key pattern we learned here is called **Cyclic Sort**.
+Here’s a clear, numbered list to follow when explaining the optimized solution to someone else, like an interviewer. This template keeps your explanation concise, logical, and professional.
 
-This pattern is useful when you have an array containing numbers in a specific range (like 1 to `N`). The main idea is to treat the array's indices as the "correct" positions for the numbers. You iterate through the array and place each number in its correct spot. This rearranges the array in a way that makes it easy to find missing or duplicate elements.
+1. **The Goal**:
+   - "The problem asks us to find the smallest positive integer (1, 2, 3, …) that is missing from an unsorted array of integers, which may contain negatives, zeros, duplicates, or large numbers. For example, if the array is [3, 4, -1, 1], the answer is 2 because it’s the smallest positive number not present."
 
-It's a powerful trick for problems that have strict memory constraints ($O(1)$ space).
+2. **My Solution Idea**:
+   - "My approach is to use the array itself as a hash table to mark the presence of numbers from 1 to `n`, where `n` is the array size. We do this in-place to avoid extra space, achieving `O(1)` space complexity."
 
-#### **Clues for Next Time**
+3. **How it Works**:
+   - "The solution has three steps:
+     1. First, I go through the array and replace any number that is negative, zero, or greater than `n` with `n + 1`, since we only care about numbers from 1 to `n`.
+     2. Next, I loop through the array again. For each number `num` (if it’s between 1 and `n`), I mark its corresponding index `num - 1` by making the number at that index negative. This shows that `num` is present.
+     3. Finally, I scan the array. The first index `i` where the number is positive means `i + 1` was not marked, so `i + 1` is the missing number. If all indices are negative, the answer is `n + 1`."
 
-How do you know when to think about Cyclic Sort for a future problem? Look for these clues:
+4. **Performance**:
+   - "This solution is fast because its time complexity is `O(n)`—we make three passes through the array: one to clean it, one to mark indices, and one to find the answer. The space complexity is `O(1)` because we only modify the array in-place and use a few variables, with no extra data structures."
 
-1.  The input is an array of numbers.
-2.  The problem states that the numbers are in a given range, for example, `[1, N]` or `[0, N]`. This is the biggest clue.
-3.  The goal is to find a **missing number**, a **duplicate number**, or the first `k` missing numbers.
-4.  You are asked to solve it in **$O(N)$ time** and **$O(1)$ space**. This constraint often means you can't use a hash map and should consider modifying the array itself.
+5. **Tricky Cases**:
+   - "I made sure it works for edge cases like:
+     - Empty array: Returns 1.
+     - All negative numbers or zeros (e.g., [-1, -2, 0]): Returns 1.
+     - No gaps (e.g., [1, 2, 3, 4]): Returns 5.
+     - Duplicates (e.g., [1, 1, 1]): Returns 2.
+     - Large numbers (e.g., [1, 2, 1000]): Ignores 1000 and returns 3.
+     By replacing irrelevant numbers and using absolute values when marking, we handle all these cases correctly."
 
-If you see these clues together, your first thought should be: *"Can I use Cyclic Sort? Can I place the numbers in their correct index positions?"*
-
-#### **One More Problem**
-
-To practice this pattern, try solving this very similar problem:
-
-*   **Problem:** [287. Find the Duplicate Number](https://leetcode.com/problems/find-the-duplicate-number/)
-*   **Description:** You are given an array of `n+1` integers where each integer is between `1` and `n` (inclusive). There is only one repeated number. Find it.
-*   **Hint:** You can use the same Cyclic Sort idea. As you try to place numbers in their correct positions, what happens when you find a number that is already in its destination spot, but it's not the *right* number?
+#### Tips for Delivery
+- **Be Clear and Concise**: Start with the goal, then explain the idea briefly before diving into details.
+- **Use Examples**: If the interviewer asks, walk through a small example (like `[3, 4, -1, 1]`) to show how the array changes.
+- **Mention Trade-offs**: Note that we sacrifice the original array (by modifying it) to save space, but this is okay since the problem doesn’t require preserving the input.
 
 ---
 
+### Step 6: Key Lessons and Future Problems
+
+#### The Main Pattern
+The key pattern here was **In-Place Hashing**. We used the array itself as a hash table to mark the presence of numbers from 1 to `n` by modifying the values at specific indices (making them negative). This allowed us to track which numbers are present without using extra space, achieving `O(1)` space complexity while maintaining `O(n)` time complexity.
+
+#### Clues for Next Time
+You can use the **In-Place Hashing** pattern when you see problems with these characteristics:
+- The problem involves an unsorted array of integers, and you need to find or check for numbers in a specific range (e.g., 1 to `n`).
+- The problem emphasizes minimizing space usage (e.g., requiring `O(1)` extra space).
+- The array can be modified (the problem doesn’t require preserving the original array).
+- Keywords like “find the smallest/largest,” “missing number,” “duplicate number,” or “numbers from 1 to n” are clues.
+- Examples of problems where this applies:
+  - Finding duplicates in an array where numbers are from 1 to `n`.
+  - Checking if all numbers from 1 to `n` are present.
+  - Problems involving marking or tracking presence without extra data structures.
+
+#### One More Problem
+To practice this pattern, try **LeetCode #442: Find All Duplicates in an Array**. In this problem, you’re given an array of integers where each integer is in the range `[1, n]` and some numbers appear twice. You need to find all numbers that appear twice, using `O(1)` extra space. This problem uses a similar in-place marking technique (e.g., making numbers negative to mark indices) to solve it efficiently.
